@@ -1,11 +1,13 @@
 #!/bin/python3
 import argparse
+import sa
+import test
 
 def main():
     parser = argparse.ArgumentParser(description='Simulated Annealing for Node Clustering.')
     parser.add_argument('-number_of_clusters', 
                         type=int,
-                        default=5,
+                        default=3,
                         help='the number of clusters that should be generated')
     parser.add_argument('-initial_temperature', 
                         type=int,
@@ -27,6 +29,13 @@ def main():
     args = parser.parse_args()
     check_arguments(args)
     print_args(args)
+    runner = sa.SA(test.get_test_graph(),
+                    args.number_of_clusters,
+                    args.initial_temperature,
+                    args.final_temperature,
+                    args.temperature_change,
+                    args.iterations_per_temperature)
+    runner.run()
     
 def check_arguments(args):
     if args.initial_temperature <= 0:
