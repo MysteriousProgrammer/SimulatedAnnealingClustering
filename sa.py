@@ -15,6 +15,8 @@ class SA:
     final_temp: int
     temp_update: float
     iters_per_temp: int
+    current_cut: int = 0
+    current_temp: int = 0
 
     def initialize_clusters(self):
         self.clusters = {}
@@ -25,6 +27,35 @@ class SA:
 
         print("Initialized {} clusters:".format(self.num_clusters))
         print(self.clusters)
-
+        
+    def  initialize_cut(self):
+        return
+    
+    def try_to_accept(self):
+        return 
+    
+    def temp_update(self):
+        return   
+    
+    def random_move(self):
+        return
+    
+    def cal_cost_delt(self):
+        return
+    
     def run(self):
         self.initialize_clusters()
+        self.initialize_cut() 
+        while self.current_temp> self.final_temp:
+            self.random_move()
+            self.cal_cost_delt()
+            if self.cal_cost_delt>0:
+                print("Movement is accepted")
+            else:
+                self.try_to_accept()
+            self.temp_update()
+        
+            
+   
+        
+        
