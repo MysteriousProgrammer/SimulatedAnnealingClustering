@@ -22,7 +22,7 @@ class SA:
         self.clusters = {}
         divided_nodes = list(split(self.nodes, self.num_clusters))
         for i in range(self.num_clusters):
-            self.clusters[i] = set(list(divided_nodes[i]))
+            self.clusters[i] = list(divided_nodes[i])
         print("Initialized {} clusters:".format(self.num_clusters))
         print(self.clusters)
         
@@ -48,16 +48,24 @@ class SA:
         self.current_temp = self.current_temp * (1 - self.temp_rate_update)
         print("Updated temperature to {}/{}".format(self.current_temp, self.final_temp))
 
-    def random_move(self):
+    def swap(self, node1, node2):
+        print("Swapping nodes {} from cluster {} with {} from cluster {}".format(node1[1], node1[0], node2[1], node2[0]))
+        # TO-DO: Actually swapping the nodes
+        print("Clusters before moving:")
+        print(self.clusters)
+        # DO THE MOVE HERE
+        print("Clusters after moving:")
+        print(self.clusters)
+        return
+
+    def select_two_nodes(self):
         cluster1, cluster2 = random.sample(range(0, len(self.clusters)), 2)
         print("Selected these ids: {} and {}".format(cluster1, cluster2))
-
-        # TO-DO: Select one node from each cluster
-        node_from_cluster1 = '???'
-        node_from_cluster2 = '???'
+        node_from_cluster1 = random.sample(self.clusters[cluster1], 1)[0]
+        node_from_cluster2 = random.sample(self.clusters[cluster2], 1)[0]
         print("Selected these nodes: {} and {}".format(node_from_cluster1, node_from_cluster2))
-        return
-    
+        return (cluster1, node_from_cluster1), (cluster2, node_from_cluster2)
+
     def cal_cost_delt(self):
         return 0
 
@@ -69,7 +77,8 @@ class SA:
         self.initialize_clusters()
         self.initialize_cut() 
         while self.current_temp > self.final_temp:
-            self.random_move()
+            node1, node2 = self.select_two_nodes()
+            self.swap(node1, node2)
             self.cal_cost_delt()
             if self.cal_cost_delt() > 0:
                 print("Movement is accepted")
