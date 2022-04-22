@@ -59,13 +59,12 @@ class SA:
 
     def swap(self, node1, node2):
         print("Swapping nodes {} from cluster {} with {} from cluster {}".format(node1[1], node1[0], node2[1], node2[0]))
-        clusters_values= list(self.clusters.values())
-        node1 = list(node1)
-        node2 = list(node2)
-        temporary = node1[1]
-        clusters_values[node1[1]] = clusters_values[node2[1]]
-        clusters_values[node2[1]] = temporary
-        print(clusters_values)
+        list_1 = self.clusters[node1[0]]
+        list_2 = self.clusters[node2[0]]
+        list_1.remove(node1[1])
+        list_2.remove(node2[1])
+        list_1.append(node2[1])
+        list_2.append(node1[1])
         
     def cal_cost_delt(self):
         return 0
