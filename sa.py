@@ -1,4 +1,5 @@
 import dataclasses
+from optparse import Values
 import graph
 import random
 from typing import List
@@ -48,16 +49,6 @@ class SA:
         self.current_temp = self.current_temp * (1 - self.temp_rate_update)
         print("Updated temperature to {}/{}".format(self.current_temp, self.final_temp))
 
-    def swap(self, node1, node2):
-        print("Swapping nodes {} from cluster {} with {} from cluster {}".format(node1[1], node1[0], node2[1], node2[0]))
-        # TO-DO: Actually swapping the nodes
-        print("Clusters before moving:")
-        print(self.clusters)
-        # DO THE MOVE HERE
-        print("Clusters after moving:")
-        print(self.clusters)
-        return
-
     def select_two_nodes(self):
         cluster1, cluster2 = random.sample(range(0, len(self.clusters)), 2)
         print("Selected these ids: {} and {}".format(cluster1, cluster2))
@@ -66,6 +57,16 @@ class SA:
         print("Selected these nodes: {} and {}".format(node_from_cluster1, node_from_cluster2))
         return (cluster1, node_from_cluster1), (cluster2, node_from_cluster2)
 
+    def swap(self, node1, node2):
+        print("Swapping nodes {} from cluster {} with {} from cluster {}".format(node1[1], node1[0], node2[1], node2[0]))
+        clusters_values= list(self.clusters.values())
+        node1 = list(node1)
+        node2 = list(node2)
+        temporary = node1[1]
+        clusters_values[node1[1]] = clusters_values[node2[1]]
+        clusters_values[node2[1]] = temporary
+        print(clusters_values)
+        
     def cal_cost_delt(self):
         return 0
 
