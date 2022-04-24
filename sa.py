@@ -1,3 +1,4 @@
+from cmath import exp
 import dataclasses
 from optparse import Values
 import graph
@@ -42,15 +43,13 @@ class SA:
                         self.cut_size = self.cut_size + 1
         self.cut_size = int(self.cut_size/2)
         print("Initial cut size: {}".format(self.cut_size))
-        
-    def try_to_accept(self):
-        return 
     
     def update_temp(self):
         self.current_temp = self.current_temp * (1 - self.temp_rate_update)
         print("Updated temperature to {}/{}".format(self.current_temp, self.final_temp))
 
     def select_two_nodes(self):
+        print("the current configration is", self.clusters.items())
         cluster1, cluster2 = random.sample(range(0, len(self.clusters)), 2)
         print("Selected these ids: {} and {}".format(cluster1, cluster2))
         node_from_cluster1 = random.sample(self.clusters[cluster1], 1)[0]
@@ -66,25 +65,27 @@ class SA:
         self.clusters[node2[0]].append(node1[1])
 
     def update_cut(self, node1, node2):
-        print("Updating cut after moving {} to cluster {} and {} to cluster {}".format(node1[1], node2[0], node2[1], node1[0]))
-
-        # TO-DO: Calculate the increase or decrease in cut size
-        # Notes:
-        # 1. Only consider the neighbors of the moved nodes
-        # 2. Pay very close atention to the cluster id from node1 and node2: they are the OLD cluster
+        self.current_cut_size = self.cut_size
         node1_object = self.clusters[node2[0]][-1]
+        print("Selected node neighors", node1_object.neighbors)
         node2_object = self.clusters[node1[0]][-1]
-        # Go through the neighbors of the node
-        print("Neighbors of node " + node1_object.name)
+        print("Selected node neighors", node2_object.neighbors)
         for neighbor in node1_object.neighbors:
-            print(neighbor.name)
-            
-        print("Neighbors of node " + node2_object.name)
+            if self.node_name_to_cluster_id[neighbor.name] != self.node_name_to_cluster_id[node2_object.name]:
+                self.current_cut_size += 1           
         for neighbor in node2_object.neighbors:
-            print(neighbor.name)
-
-        return
-    
+            if self.node_name_to_cluster_id[neighbor.name] == self.node_name_to_cluster_id[node1_object.name]:
+                self.current_cut_size += 1 
+        print("Current cut after moving {} to cluster {} and {} to cluster {} is {}".format(node1[1], node2[0], node2[1], node1[0], self.current_cut_size)) 
+        
+    def try_to_accept(self):
+        self.rondom_num = random.uniform(0 , 1)
+        self.delta_cut_size = self.cut_size - self.current_cut_size
+        self.Boltzmann_probability = abs(exp(-self.delta_cut_size/ self.current_temp))
+        if  self.delta_cut_size < 0 and self.Boltzmann_probability > self.rondom_num :
+            print(" The movement is accepted and the curremt cut size is {} and the new configartion is {}".format(self.current_cut_size, self.clusters))
+        else:
+            self.current_cut_size = self.cut_size
     def run(self):
         self.current_temp = self.initial_temp
         self.initialize_clusters()
@@ -95,7 +96,7 @@ class SA:
             self.swap(node1, node2)
             old_cut = self.cut_size
             self.update_cut(node1, node2)
-            new_cut = self.cut_size
+            new_cut = self.current_cut_size
             delta = old_cut - new_cut
             if delta > 0:
                 print("Movement is accepted")
