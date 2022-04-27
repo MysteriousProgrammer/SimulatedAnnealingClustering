@@ -63,6 +63,25 @@ class SA:
         self.node_name_to_cluster_id[node1[1].name] = node2[0]
         self.node_name_to_cluster_id[node2[1].name] = node1[0]
 
+    def incrementally_update_cut(self, 
+                                 moved_node1, 
+                                 node1_old_cluster,
+                                 node1_new_cluster,
+                                 moved_node2, 
+                                 node2_old_cluster,
+                                 node2_new_cluster):
+        delta = 0
+        for node, other_node, old, new in [(moved_node1, moved_node2, node1_old_cluster, node1_new_cluster), (moved_node2, moved_node1, node2_old_cluster, node2_new_cluster)]:
+            for neighbor in node.neighbors:
+                if neighbor == other_node: continue
+                neighbor_cluster = self.node_name_to_cluster_id[neighbor.name]
+                if old == neighbor_cluster:
+                    delta += 1
+                elif new == neighbor_cluster:
+                    delta -= 1
+        self.current_cut_size = self.current_cut_size + delta
+        return delta
+
     def try_to_accept(self, delta):
         probability_of_accepting = abs(exp((-delta/(self.current_temp/100))))
         random_number = random.uniform(0.0, 1.0)
@@ -89,21 +108,27 @@ class SA:
             for _ in range(self.iters_per_temp):
                 node1, node2 = self.select_two_nodes()
                 self.swap(node1, node2)
-                old_cut = self.current_cut_size
-                self.initialize_cut()
+                delta = self.incrementally_update_cut(node1[1], 
+                                                      node1[0], 
+                                                      node2[0], 
+                                                      node2[1],
+                                                      node2[0],
+                                                      node1[0])
                 if self.current_cut_size < self.best_cut:
-                    self.update_best_solution()             
-                new_cut = self.current_cut_size
-                delta = new_cut - old_cut
+                    self.update_best_solution()
                 if delta > 0:
                     if not self.try_to_accept(delta):                    
                         new_node1 = (node2[0], node1[1])
                         new_node2 = (node1[0], node2[1])
                         self.swap(new_node1, new_node2)
-                        self.initialize_cut()
+                        self.current_cut_size = self.current_cut_size - delta
+                        
             self.cut_history.append(self.current_cut_size)
             self.update_temp()
 
+        print("Incremetally calculated cut: " + str(self.current_cut_size))
+        self.initialize_cut()
+        print("Globally calculated cut: " + str(self.current_cut_size))
         self.plot_graph()
         print("Best cut: {}\nBest solution: {}".format(self.best_cut, self.best_solution))
 

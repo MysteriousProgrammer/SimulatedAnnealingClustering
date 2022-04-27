@@ -22,14 +22,14 @@ def main():
                         default=0.05,
                         help='update rate for the temperature')
     parser.add_argument('-iterations_per_temperature', 
-                        type=int, 
+                        type=int,
                         default=1,
                         help='the number of random movements between two temperature changes')
 
     args = parser.parse_args()
     check_arguments(args)
     print_args(args)
-    runner = sa.SA(test.get_test_graph(),
+    runner = sa.SA(test.get_big_test_graph(),
                     args.number_of_clusters,
                     args.initial_temperature,
                     args.final_temperature,

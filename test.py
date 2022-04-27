@@ -1,7 +1,7 @@
 import graph
 import random
 
-def get_test_graph():
+def get_small_test_graph():
     random.seed(0)
     # This is a hard-coded graph for testing
     a = graph.Node('a')
@@ -29,10 +29,10 @@ def get_test_graph():
 
     return nodes
 
-def generate_test():
+def get_big_test_graph():
     random.seed(0)
     nodes = []
-    number_of_nodes = 1000
+    number_of_nodes = 100
     number_of_neighbors_per_node = 5
     for i in range(0, number_of_nodes):
         nodes.append(graph.Node("n_" + str(i)))
